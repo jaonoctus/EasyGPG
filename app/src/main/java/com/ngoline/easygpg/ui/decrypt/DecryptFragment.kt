@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import com.ngoline.easygpg.PGPKeyManager
 import com.ngoline.easygpg.R
 import com.ngoline.easygpg.databinding.FragmentDecryptBinding
@@ -64,6 +65,9 @@ class DecryptFragment : Fragment() {
                     keyManager.decryptMessage(encryptedMessage)
                 }
                 textView.text = result
+                if (shouldClearFieldsAfterOperation()) {
+                    editTextMessage.setText("")
+                }
             }
         }
 
@@ -88,9 +92,17 @@ class DecryptFragment : Fragment() {
             textView.text = withContext(Dispatchers.IO) {
                 keyManager.decryptMessage(encryptedMessage)
             }
+            if (shouldClearFieldsAfterOperation()) {
+                editTextMessage.setText("")
+            }
         }
 
         return root
+    }
+
+    private fun shouldClearFieldsAfterOperation(): Boolean {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        return prefs.getBoolean(getString(R.string.clear_fields_after_operation), true)
     }
 
     override fun onDestroy() {
