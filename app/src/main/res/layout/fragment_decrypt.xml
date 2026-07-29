@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:autofillHints="text"
         android:hint="@string/enter_cipher"
+        android:imeOptions="flagNoPersonalizedLearning"
         android:inputType="text" />
 
     <Button

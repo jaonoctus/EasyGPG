@@ -21,6 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Enter alias for the key"
+                android:imeOptions="flagNoPersonalizedLearning"
                 android:inputType="text"/>
 
             <EditText
@@ -28,6 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Paste public key here"
+                android:imeOptions="flagNoPersonalizedLearning"
                 android:inputType="textMultiLine" />
         </LinearLayout>
     </ScrollView>

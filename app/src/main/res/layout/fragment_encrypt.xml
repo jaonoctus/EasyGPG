@@ -15,6 +15,7 @@
         android:gravity="top|start"
         android:autofillHints="text"
         android:hint="@string/enter_message"
+        android:imeOptions="flagNoPersonalizedLearning"
         android:inputType="textMultiLine"
         android:scrollbars="vertical" />
 

@@ -3,6 +3,7 @@ package com.ngoline.easygpg.ui.settings
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.viewModels
@@ -83,7 +84,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun generateKey() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Enter an alias for this key")
-        val input = EditText(requireContext())
+        val input = EditText(requireContext()).apply {
+            imeOptions = imeOptions or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
+        }
         builder.setView(input)
         builder.setPositiveButton("OK") { _, _ ->
             val alias = input.text.toString()
