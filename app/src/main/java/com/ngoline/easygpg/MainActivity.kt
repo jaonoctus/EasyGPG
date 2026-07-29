@@ -41,6 +41,46 @@ class MainActivity : AppCompatActivity() {
         Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME)
         Security.insertProviderAt(bcProvider, 1)
 
+        // Nothing is shown until authentication succeeds.
+        authenticateUser()
+    }
+
+    private fun authenticateUser() {
+        val biometricManager = BiometricManager.from(this)
+        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                showBiometricPrompt()
+            }
+            else -> {
+                finish()
+            }
+        }
+    }
+
+    private fun showBiometricPrompt() {
+        val executor = ContextCompat.getMainExecutor(this)
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Unlock EasyGPG")
+            .setSubtitle("Authenticate to access your keys")
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            .build()
+        val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                onAuthenticated()
+            }
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                finish()
+            }
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+            }
+        })
+        biometricPrompt.authenticate(promptInfo)
+    }
+
+    private fun onAuthenticated() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -82,7 +122,7 @@ class MainActivity : AppCompatActivity() {
             launchDeviceNotificationOptions()
         }
 
-        // Handle notification tap to decrypt
+        // Decrypt notification messages only after authentication.
         val encryptedMessage = intent.getStringExtra("encrypted_message")
         if (!encryptedMessage.isNullOrEmpty()) {
             val bundle = Bundle().apply {
@@ -90,43 +130,6 @@ class MainActivity : AppCompatActivity() {
             }
             navController.navigate(R.id.nav_decrypt, bundle)
         }
-
-        authenticateUser()
-    }
-
-    private fun authenticateUser() {
-        val biometricManager = BiometricManager.from(this)
-        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
-            BiometricManager.BIOMETRIC_SUCCESS -> {
-                showBiometricPrompt()
-            }
-            else -> {
-                finish()
-            }
-        }
-    }
-
-    private fun showBiometricPrompt() {
-        val executor = ContextCompat.getMainExecutor(this)
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Unlock EasyGPG")
-            .setSubtitle("Authenticate to access your keys")
-            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-            .build()
-        val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                // Proceed as normal
-            }
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-                finish()
-            }
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-            }
-        })
-        biometricPrompt.authenticate(promptInfo)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
