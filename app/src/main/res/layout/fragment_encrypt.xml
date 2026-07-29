@@ -7,7 +7,7 @@
     android:padding="16dp"
     tools:context=".ui.encrypt.EncryptFragment">
 
-    <EditText
+    <com.ngoline.easygpg.ui.IncognitoEditText
         android:id="@+id/editTextMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,7 +15,6 @@
         android:gravity="top|start"
         android:autofillHints="text"
         android:hint="@string/enter_message"
-        android:imeOptions="flagNoPersonalizedLearning"
         android:inputType="textMultiLine"
         android:scrollbars="vertical" />
 
