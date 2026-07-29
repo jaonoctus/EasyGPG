@@ -21,4 +21,10 @@
         android:title="Clear fields after encrypt/decrypt"
         android:summary="Clear the message input on the Encrypt and Decrypt screens once the operation completes"
         android:defaultValue="true" />
+
+    <SwitchPreferenceCompat
+        android:key="@string/privacy_mode"
+        android:title="@string/privacy_mode_title"
+        android:summary="@string/privacy_mode_summary"
+        android:defaultValue="false" />
 </PreferenceScreen>

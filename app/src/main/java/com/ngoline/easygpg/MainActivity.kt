@@ -4,12 +4,14 @@ import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.content.pm.PackageManager
 import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
+import android.view.WindowManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.ui.AppBarConfiguration
@@ -27,14 +29,18 @@ import kotlin.text.split
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),
+    SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        applyPrivacyMode()
 
         // Register our BouncyCastle version
         val bcProvider = BouncyCastleProvider()
@@ -43,6 +49,38 @@ class MainActivity : AppCompatActivity() {
 
         // Nothing is shown until authentication succeeds.
         authenticateUser()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .registerOnSharedPreferenceChangeListener(this)
+        applyPrivacyMode()
+    }
+
+    override fun onStop() {
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .unregisterOnSharedPreferenceChangeListener(this)
+        super.onStop()
+    }
+
+    override fun onSharedPreferenceChanged(
+        sharedPreferences: SharedPreferences?,
+        key: String?,
+    ) {
+        if (key == getString(R.string.privacy_mode)) {
+            applyPrivacyMode()
+        }
+    }
+
+    private fun applyPrivacyMode() {
+        val enabled = PreferenceManager.getDefaultSharedPreferences(this)
+            .getBoolean(getString(R.string.privacy_mode), false)
+        if (enabled) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
     }
 
     private fun authenticateUser() {
