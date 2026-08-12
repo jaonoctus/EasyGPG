@@ -16,14 +16,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <EditText
+            <com.ngoline.easygpg.ui.IncognitoEditText
                 android:id="@+id/editTextAlias"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Enter alias for the key"
                 android:inputType="text"/>
 
-            <EditText
+            <com.ngoline.easygpg.ui.IncognitoEditText
                 android:id="@+id/editTextPublicKey"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

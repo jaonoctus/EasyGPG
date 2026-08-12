@@ -3,7 +3,6 @@ package com.ngoline.easygpg.ui.settings
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
-import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -11,6 +10,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.ngoline.easygpg.PGPKeyManager
 import com.ngoline.easygpg.R
+import com.ngoline.easygpg.ui.IncognitoEditText
 import com.yubico.yubikit.android.YubiKitManager
 import com.yubico.yubikit.android.transport.nfc.NfcConfiguration
 import com.yubico.yubikit.android.transport.nfc.NfcNotAvailable
@@ -83,7 +83,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun generateKey() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Enter an alias for this key")
-        val input = EditText(requireContext())
+        val input = IncognitoEditText(requireContext())
         builder.setView(input)
         builder.setPositiveButton("OK") { _, _ ->
             val alias = input.text.toString()
