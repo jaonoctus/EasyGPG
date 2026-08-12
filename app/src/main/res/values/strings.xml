@@ -39,4 +39,8 @@
     <string name="delete_imported_key_confirm_message">Delete \'%1$s\'? This cannot be undone.</string>
     <string name="key_deleted">Key deleted</string>
     <string name="no_key_selected">No key selected</string>
+    <string name="remember_passphrase">Remember</string>
+    <string name="cache_ttl_lock_screen">until screen off</string>
+    <string name="cache_ttl_one_hour">for one hour</string>
+    <string name="cache_ttl_one_day">for one day</string>
 </resources>
