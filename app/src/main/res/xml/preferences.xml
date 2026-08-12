@@ -15,4 +15,10 @@
         android:title="Obfuscate PGP Markers"
         android:summary="Replace PGP BEGIN/END markers with a hex pattern to make messages harder to detect"
         android:defaultValue="false" />
+
+    <SwitchPreferenceCompat
+        android:key="@string/clear_fields_after_operation"
+        android:title="Clear fields after encrypt/decrypt"
+        android:summary="Clear the message input on the Encrypt and Decrypt screens once the operation completes"
+        android:defaultValue="true" />
 </PreferenceScreen>

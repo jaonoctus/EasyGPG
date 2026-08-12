@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import com.ngoline.easygpg.data.KeyItem
 import com.ngoline.easygpg.data.shortFingerprint
 import com.ngoline.easygpg.PGPKeyManager
@@ -80,7 +81,9 @@ class EncryptFragment : Fragment() {
                         keyManager.encryptMessage(message, selectedKey)
                     }
                     shareEncryptedMessage(encryptedMessage)
-                    editTextMessage.setText("")
+                    if (shouldClearFieldsAfterOperation()) {
+                        editTextMessage.setText("")
+                    }
                 }
             } else {
                 Toast.makeText(requireContext(), "No public key selected", Toast.LENGTH_SHORT).show()
@@ -92,6 +95,11 @@ class EncryptFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun shouldClearFieldsAfterOperation(): Boolean {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        return prefs.getBoolean(getString(R.string.clear_fields_after_operation), true)
     }
 
     private fun loadPublicKeys() {
