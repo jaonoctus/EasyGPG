@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.ngoline.easygpg.data.KeyAdapter
 import com.ngoline.easygpg.data.KeyItem
 import com.ngoline.easygpg.PGPKeyManager
+import com.ngoline.easygpg.PassphraseCache
 import com.ngoline.easygpg.R
 import com.ngoline.easygpg.databinding.FragmentKeysBinding
 import org.bouncycastle.bcpg.ArmoredOutputStream
@@ -192,6 +193,8 @@ class KeysFragment() : Fragment() {
             setMessage(getString(R.string.delete_key_confirm_message, keyItem.alias))
             setPositiveButton(R.string.delete_key) { _, _ ->
                 keyManager.deleteMyKey(keyItem.alias)
+                // Don't keep the passphrase of a key that no longer exists in memory.
+                PassphraseCache.clear()
                 Toast.makeText(context, R.string.key_deleted, Toast.LENGTH_SHORT).show()
                 loadMyKeys()
                 updateMyKeyDisplay(myKeys.firstOrNull())

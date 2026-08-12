@@ -19,7 +19,9 @@ import com.ngoline.easygpg.data.KeyItem
 import com.ngoline.easygpg.data.shortFingerprint
 import com.ngoline.easygpg.PGPKeyManager
 import com.ngoline.easygpg.R
+import com.ngoline.easygpg.copyToCharArray
 import com.ngoline.easygpg.databinding.FragmentEncryptBinding
+import com.ngoline.easygpg.useThenWipe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -71,14 +73,16 @@ class EncryptFragment : Fragment() {
         loadPublicKeys()
 
         buttonEncryptShare.setOnClickListener {
-            val message = editTextMessage.text.toString()
             val selectedIndex = spinnerPublicKeys.selectedItemPosition
             if (selectedIndex != -1 && selectedIndex < publicKeyList.size) {
                 val selectedKey = publicKeyList[selectedIndex]  // Get the public key using the selected index
+                // The typed message is copied into a buffer of our own so it can be wiped; what the
+                // EditText keeps internally is beyond our reach.
+                val message = editTextMessage.text.copyToCharArray()
                 // Run encryption in a background thread
                 lifecycleScope.launch {
                     val encryptedMessage = withContext(Dispatchers.Default) {
-                        keyManager.encryptMessage(message, selectedKey)
+                        message.useThenWipe { keyManager.encryptMessage(it, selectedKey) }
                     }
                     shareEncryptedMessage(encryptedMessage)
                     if (shouldClearFieldsAfterOperation()) {

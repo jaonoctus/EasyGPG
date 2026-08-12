@@ -39,6 +39,32 @@
     <string name="delete_imported_key_confirm_message">Delete \'%1$s\'? This cannot be undone.</string>
     <string name="key_deleted">Key deleted</string>
     <string name="no_key_selected">No key selected</string>
+    <string name="passphrase_hint">Passphrase</string>
+    <string name="passphrase_confirm_hint">Confirm passphrase</string>
+    <plurals name="passphrase_too_short">
+        <item quantity="one">Passphrase must be at least %1$d character</item>
+        <item quantity="other">Passphrase must be at least %1$d characters</item>
+    </plurals>
+    <string name="passphrase_mismatch">Passphrases do not match</string>
+    <string name="passphrase_generate_title">Set a passphrase</string>
+    <string name="passphrase_generate_message">This passphrase encrypts the new private key on this device. It cannot be recovered — if you forget it, messages encrypted to this key can no longer be decrypted.</string>
+    <string name="passphrase_decrypt_title">Enter your key passphrase</string>
+    <string name="passphrase_migrate_title">Protect your existing keys</string>
+    <string name="passphrase_migrate_message">Your keys were created with a placeholder passphrase that offered no protection. Choose a passphrase now to re-encrypt their private keys, then this message will decrypt.</string>
+    <plurals name="passphrase_migrate_done">
+        <item quantity="one">Re-encrypted %1$d key ring with your passphrase</item>
+        <item quantity="other">Re-encrypted %1$d key rings with your passphrase</item>
+    </plurals>
+    <string name="passphrase_migrate_failed">Could not re-encrypt your key rings</string>
+    <string name="key_generated">Key \'%1$s\' generated</string>
+    <string name="key_generation_failed">Could not generate the key</string>
+    <string name="alias_required">Alias must not be empty</string>
+    <string name="decrypt_wrong_passphrase">Wrong passphrase for the key this message was encrypted to.</string>
+    <string name="decrypt_no_usable_key">No private key on this device can decrypt this message.</string>
+    <string name="unlock_keys_title">Unlock your private keys</string>
+    <string name="unlock_keys_subtitle">Authenticate to use the keys stored on this device</string>
+    <string name="authentication_required">Authentication is required to use your private keys.</string>
+    <string name="keys_unreadable">The device lock screen was removed or reset, so the private keys stored on this device can no longer be read.</string>
     <string name="remember_passphrase">Remember</string>
     <string name="cache_ttl_lock_screen">until screen off</string>
     <string name="cache_ttl_one_hour">for one hour</string>
