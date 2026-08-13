@@ -48,9 +48,19 @@ development alive. Please read [CONTRIBUTING.md](CONTRIBUTING.md) to get started
 Easy GPG handles cryptographic material, so please treat it with care:
 
 - It is **alpha, unaudited** software.
-- There are known limitations being worked on — for example, generated key
-  rings currently use a placeholder passphrase (see `PGPKeyManager.kt`). This is
-  tracked and should be fixed before any stable release.
+- Secret key rings are encrypted with a passphrase you choose when the key is
+  generated, on top of the Android Keystore layer. Key rings created by earlier
+  versions used a placeholder passphrase; the app asks you to replace it the
+  first time you decrypt a message.
+- Your passphrase cannot be recovered. If you forget it, messages encrypted to
+  that key can no longer be decrypted.
+- When you enter a passphrase you choose how long it is remembered: until the
+  screen turns off, for one hour (default), or for one day. It is held in memory
+  only, overwritten when it expires, and always gone once the app process ends.
+- Private keys are additionally sealed with an Android Keystore key that requires
+  biometric or device-credential authentication within the last five minutes, so
+  they cannot be read without you being present. Removing or resetting the device
+  lock screen destroys that key, and with it access to the stored private keys.
 - Found a vulnerability? Please **do not** open a public issue. Instead, report
   it privately to the maintainer (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 

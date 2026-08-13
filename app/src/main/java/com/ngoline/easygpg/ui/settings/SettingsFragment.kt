@@ -9,8 +9,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.ngoline.easygpg.PGPKeyManager
+import com.ngoline.easygpg.PassphraseCache
 import com.ngoline.easygpg.R
+import com.ngoline.easygpg.ui.DeviceAuth
 import com.ngoline.easygpg.ui.IncognitoEditText
+import com.ngoline.easygpg.ui.PassphrasePrompt
+import com.ngoline.easygpg.wipe
 import com.yubico.yubikit.android.YubiKitManager
 import com.yubico.yubikit.android.transport.nfc.NfcConfiguration
 import com.yubico.yubikit.android.transport.nfc.NfcNotAvailable
@@ -86,13 +90,54 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val input = IncognitoEditText(requireContext())
         builder.setView(input)
         builder.setPositiveButton("OK") { _, _ ->
-            val alias = input.text.toString()
-            keyManager.generateAndSaveKeys(alias)
-            Toast.makeText(requireContext(), "Public keyring imported and trusted!", Toast.LENGTH_SHORT).show()
+            val alias = input.text.toString().trim()
+            if (alias.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.alias_required, Toast.LENGTH_SHORT).show()
+                return@setPositiveButton
+            }
+            promptForPassphraseAndGenerate(alias)
         }
         builder.setNegativeButton("Cancel", null)
         builder.show()
     }
+
+    private fun promptForPassphraseAndGenerate(alias: String) {
+        PassphrasePrompt.show(
+            requireContext(),
+            titleRes = R.string.passphrase_generate_title,
+            messageRes = R.string.passphrase_generate_message,
+            confirm = true,
+        ) { passphrase, remember ->
+            lifecycleScope.launch {
+                val context = requireContext()
+                // Writing the secret key ring needs the authenticated Keystore key.
+                val generated = try {
+                    keyOperation {
+                        withContext(Dispatchers.Default) {
+                            keyManager.generateAndSaveKeys(alias, passphrase)
+                        }.also { generated ->
+                            if (generated) PassphraseCache.store(context, passphrase, remember)
+                        }
+                    }
+                } finally {
+                    passphrase.wipe()
+                }
+                if (!isAdded || generated == null) return@launch
+                val message = if (generated) {
+                    getString(R.string.key_generated, alias)
+                } else {
+                    getString(R.string.key_generation_failed)
+                }
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    /** Runs a key manager call, prompting for authentication and reporting a locked key ring. */
+    private suspend fun <T> keyOperation(block: suspend () -> T): T? =
+        DeviceAuth.withKeyAccess(this, { reason ->
+            if (isAdded) Toast.makeText(requireContext(), reason, Toast.LENGTH_LONG).show()
+        }, block)
 
     private fun importPublicKeyFromYubikey() {
         Toast.makeText(requireContext(), "Waiting for Yubikey... (insert via USB or tap via NFC)", Toast.LENGTH_LONG).show()

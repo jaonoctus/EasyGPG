@@ -11,7 +11,6 @@ import android.content.pm.PackageManager
 import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
-import android.view.WindowManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.ui.AppBarConfiguration
@@ -27,9 +26,10 @@ import java.security.Security
 import kotlin.text.isNotEmpty
 import kotlin.text.split
 import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import com.ngoline.easygpg.ui.DeviceAuth
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(),
     SharedPreferences.OnSharedPreferenceChangeListener {
@@ -74,48 +74,26 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun applyPrivacyMode() {
-        val enabled = PreferenceManager.getDefaultSharedPreferences(this)
-            .getBoolean(getString(R.string.privacy_mode), false)
-        if (enabled) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        }
+        window.applyPrivacyMode(this)
     }
 
+    /**
+     * Authenticating here is also what authorises the Keystore key protecting the secret key rings,
+     * so nothing is shown — and no key material is readable — until it succeeds.
+     */
     private fun authenticateUser() {
         val biometricManager = BiometricManager.from(this)
-        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
-            BiometricManager.BIOMETRIC_SUCCESS -> {
-                showBiometricPrompt()
-            }
-            else -> {
-                finish()
-            }
+        if (biometricManager.canAuthenticate(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            ) != BiometricManager.BIOMETRIC_SUCCESS
+        ) {
+            finish()
+            return
         }
-    }
-
-    private fun showBiometricPrompt() {
-        val executor = ContextCompat.getMainExecutor(this)
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Unlock EasyGPG")
-            .setSubtitle("Authenticate to access your keys")
-            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-            .build()
-        val biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                onAuthenticated()
-            }
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-                finish()
-            }
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-            }
-        })
-        biometricPrompt.authenticate(promptInfo)
+        lifecycleScope.launch {
+            if (DeviceAuth.authenticate(this@MainActivity)) onAuthenticated() else finish()
+        }
     }
 
     private fun onAuthenticated() {
