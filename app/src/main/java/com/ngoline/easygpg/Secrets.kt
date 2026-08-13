@@ -15,8 +15,9 @@ import java.nio.CharBuffer
  *
  * Heap scrubbing on Android is best effort: the garbage collector may have copied a buffer before it
  * was wiped, and Bouncy Castle and the framework keep copies of their own (parsed key rings, the
- * `Editable` behind an `EditText`, `TextView` layouts, the clipboard) that no app can reach. Wiping
- * the buffers we do own still removes the longest-lived, highest-value copies.
+ * `Editable` behind an `EditText`, the `String` a selectable `TextView` copies its text into,
+ * `TextView` layouts, the clipboard) that no app can reach. Wiping the buffers we do own still
+ * removes the longest-lived, highest-value copies.
  */
 
 /** Overwrites the characters of this buffer. */

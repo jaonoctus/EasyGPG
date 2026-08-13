@@ -212,8 +212,11 @@ class DecryptFragment : Fragment() {
     }
 
     /**
-     * Shows decrypted text straight from [plaintext] — `TextView` wraps the array instead of
-     * copying it — and keeps it so it can be wiped as soon as it stops being displayed.
+     * Shows decrypted text from [plaintext] and keeps the buffer so it can be wiped as soon as it
+     * stops being displayed. Because this view is selectable, `TextView` cannot wrap the array: a
+     * selectable view always has a movement method, so `setText` turns the text into a `Spannable`,
+     * which copies it into a `String` no app can overwrite. Wiping therefore removes our copy only,
+     * and that `String` lives until the garbage collector reclaims it.
      */
     private fun showPlaintext(plaintext: CharArray) {
         wipeShownPlaintext()
@@ -221,7 +224,7 @@ class DecryptFragment : Fragment() {
         textView.setText(plaintext, 0, plaintext.size)
     }
 
-    /** Replaces displayed plaintext with [message] (or nothing) and wipes the buffer behind it. */
+    /** Replaces displayed plaintext with [message] (or nothing) and wipes the buffer we own. */
     private fun wipeShownPlaintext(message: String = "") {
         val plaintext = shownPlaintext
         shownPlaintext = null
@@ -240,7 +243,7 @@ class DecryptFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        // Leaving the screen must not leave the decrypted text sitting in memory.
+        // Leaving the screen must not leave our copy of the decrypted text sitting in memory.
         wipeShownPlaintext()
         _binding = null
         super.onDestroyView()

@@ -118,7 +118,11 @@ class SecretKeyStoreLostException(cause: Throwable) : SecretKeyAccessException(c
 
 /** Outcome of [PGPKeyManager.decryptMessage]. */
 sealed interface DecryptionResult {
-    /** The caller owns [plaintext] and must [wipe] it once it is no longer displayed. */
+    /**
+     * The caller owns [plaintext] and must [wipe] it once it is no longer displayed. Wiping reaches
+     * this buffer alone: displaying it in a selectable `TextView` also copies it into a `String`
+     * that no app can overwrite.
+     */
     class Decrypted(val plaintext: CharArray) : DecryptionResult
 
     /** A stored key ring is addressed by the message, but the passphrase did not unlock it. */
